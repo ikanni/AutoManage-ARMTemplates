@@ -26,7 +26,7 @@
     },
     "autoManageAccountDeployName": {
       "type": "string",
-      "defaultValue": "[concat(parameters('autoManageAccountName'), utcNow('yyyyMMddHHmmss'))]"
+      "defaultValue": "[concat(parameters('autoManageAccountName'), '-', utcNow('yyyyMMddHHmmss'))]"
     },
     "assignmentDeployName": {
       "type": "string",
@@ -103,7 +103,7 @@
     {
         "type": "Microsoft.Authorization/roleAssignments",
         "apiVersion": "2020-04-01-preview",
-        "name": "[guid(parameters('autoManageAccountDeployName'), variables('contributor'))]",
+        "name": "[guid(parameters('autoManageAccountName'), parameters('autoManageAccountResourceGroup'), variables('resourcePolicyContributor'))]",
         "dependsOn": [
           "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('autoManageAccountResourceGroup'))]",  "[parameters('autoManageAccountDeployName')]"
         ],
@@ -118,7 +118,7 @@
     {
         "type": "Microsoft.Authorization/roleAssignments",
         "apiVersion": "2020-04-01-preview",
-        "name": "[guid(parameters('autoManageAccountDeployName'), variables('resourcePolicyContributor'))]",
+        "name": "[guid(parameters('autoManageAccountName'), parameters('autoManageAccountResourceGroup'), variables('resourcePolicyContributor'))]",
         "dependsOn": [
           "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('autoManageAccountResourceGroup'))]",  "[parameters('autoManageAccountDeployName')]"
         ],
