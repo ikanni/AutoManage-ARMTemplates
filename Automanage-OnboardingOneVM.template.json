@@ -184,11 +184,5 @@
         }
       }
     }
-  ],
-  "outputs": {
-    "resourceID": {
-      "type": "string",
-      "value": "[variables('autoManageAccountResourceId')]"
-    }
-  }
+  ]
 }
