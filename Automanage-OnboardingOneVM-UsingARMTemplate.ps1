@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS 
     Onboard a azure virtual machine to azure automanage
 
@@ -14,7 +14,7 @@
       3. Creates Assignment for the VM.
        
 .EXAMPLE 
-   .\OnboardOneVMUsingARMTemplate.ps1 -SubscriptionId <SubscriptionId> -VMResourceGroup <VMResourceGroup> -VMName <VMName>
+   .\Automanage-OnboardingOneVM-UsingARMTemplate.ps1 -SubscriptionId <SubscriptionId> -VMResourceGroup <VMResourceGroup> -VMName <VMName>
 
 .NOTES
     AUTHOR: Azure automanage Team
