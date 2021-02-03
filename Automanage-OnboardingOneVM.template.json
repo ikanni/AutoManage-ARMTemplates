@@ -22,7 +22,11 @@
     },
     "configurationProfile": {
       "type": "string",
-       "defaultValue": "Azure virtual machine best practices – Production"
+      "defaultValue": "Azure virtual machine best practices – Production",
+      "allowedValues": [
+        "Azure virtual machine best practices – Dev/Test",        
+        "Azure virtual machine best practices – Production"
+      ]
     },
     "autoManageAccountDeployName": {
       "type": "string",
@@ -31,6 +35,10 @@
     "assignmentDeployName": {
       "type": "string",
       "defaultValue": "[concat('AssignmentDeployment-', parameters('vMName'))]"
+    },
+    "autoManageAccountExist": {
+      "type": "bool",
+      "defaultValue" : true
     }
   },
   "variables": {
@@ -40,16 +48,16 @@
   },
   "resources": [
     {
+      "condition": "[parameters('autoManageAccountExist')]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "name": "[parameters('autoManageAccountResourceGroup')]",
       "location": "[parameters('autoManageAccountLocation')]"
-    }
-    ,
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "condition": "[equals(parameters('autoManageAccountSubscriptionId'), subscription().subscriptionId)]",
+      "condition": "[and (parameters('autoManageAccountExist'), equals(parameters('autoManageAccountSubscriptionId'), subscription().subscriptionId))]",
       "name": "[parameters('autoManageAccountDeployName')]",
       "resourceGroup": "[parameters('autoManageAccountResourceGroup')]",
       "dependsOn": [
@@ -98,9 +106,9 @@
           }
         }
       }
-    }
-    ,
+    },
     {
+        "condition": "[parameters('autoManageAccountExist')]",
         "type": "Microsoft.Authorization/roleAssignments",
         "apiVersion": "2020-04-01-preview",
         "name": "[guid(parameters('autoManageAccountName'), parameters('autoManageAccountResourceGroup'), variables('contributor'))]",
@@ -113,9 +121,9 @@
           "principalType": "ServicePrincipal",
           "scope": "[subscription().id]"
         }
-    }
-    ,
+    },
     {
+        "condition": "[parameters('autoManageAccountExist')]",
         "type": "Microsoft.Authorization/roleAssignments",
         "apiVersion": "2020-04-01-preview",
         "name": "[guid(parameters('autoManageAccountName'), parameters('autoManageAccountResourceGroup'), variables('resourcePolicyContributor'))]",
@@ -128,8 +136,7 @@
           "principalType": "ServicePrincipal",
           "scope": "[subscription().id]"
         }
-    }
-    ,
+    },
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
