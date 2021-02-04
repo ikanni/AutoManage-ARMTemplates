@@ -36,7 +36,7 @@
       "type": "string",
       "defaultValue": "[concat('AssignmentDeployment-', parameters('vMName'))]"
     },
-    "autoManageAccountExist": {
+    "createAutoManageAccount": {
       "type": "bool",
       "defaultValue" : true
     }
@@ -48,16 +48,16 @@
   },
   "resources": [
     {
-      "condition": "[parameters('autoManageAccountExist')]",
+      "condition": "[parameters('createAutoManageAccount')]",
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2019-10-01",
       "name": "[parameters('autoManageAccountResourceGroup')]",
       "location": "[parameters('autoManageAccountLocation')]"
     },
     {
+      "condition": "[and(parameters('createAutoManageAccount'), equals(parameters('autoManageAccountSubscriptionId'), subscription().subscriptionId))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2019-10-01",
-      "condition": "[and (parameters('autoManageAccountExist'), equals(parameters('autoManageAccountSubscriptionId'), subscription().subscriptionId))]",
       "name": "[parameters('autoManageAccountDeployName')]",
       "resourceGroup": "[parameters('autoManageAccountResourceGroup')]",
       "dependsOn": [
@@ -108,7 +108,7 @@
       }
     },
     {
-        "condition": "[parameters('autoManageAccountExist')]",
+        "condition": "[parameters('createAutoManageAccount')]",
         "type": "Microsoft.Authorization/roleAssignments",
         "apiVersion": "2020-04-01-preview",
         "name": "[guid(parameters('autoManageAccountName'), parameters('autoManageAccountResourceGroup'), variables('contributor'))]",
@@ -117,13 +117,13 @@
         ],
         "properties": {
           "roleDefinitionId": "[variables('contributor')]",
-          "principalId": "[reference(parameters('autoManageAccountDeployName')).outputs.principalId.value]",
+          "principalId": "[if(parameters('createAutoManageAccount'), reference(parameters('autoManageAccountDeployName')).outputs.principalId.value, 'resource not deployed')]",
           "principalType": "ServicePrincipal",
           "scope": "[subscription().id]"
         }
     },
     {
-        "condition": "[parameters('autoManageAccountExist')]",
+        "condition": "[parameters('createAutoManageAccount')]",
         "type": "Microsoft.Authorization/roleAssignments",
         "apiVersion": "2020-04-01-preview",
         "name": "[guid(parameters('autoManageAccountName'), parameters('autoManageAccountResourceGroup'), variables('resourcePolicyContributor'))]",
@@ -132,7 +132,7 @@
         ],
         "properties": {
           "roleDefinitionId": "[variables('resourcePolicyContributor')]",
-          "principalId": "[reference(parameters('autoManageAccountDeployName')).outputs.principalId.value]",
+          "principalId": "[if(parameters('createAutoManageAccount'), reference(parameters('autoManageAccountDeployName')).outputs.principalId.value, 'resource not deployed')]",
           "principalType": "ServicePrincipal",
           "scope": "[subscription().id]"
         }
