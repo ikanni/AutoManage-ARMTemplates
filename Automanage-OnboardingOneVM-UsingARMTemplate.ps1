@@ -14,11 +14,11 @@
       3. Creates Assignment for the VM.
        
 .EXAMPLE 
-   .\Automanage-OnboardingOneVM-UsingARMTemplate.ps1 -SubscriptionId <SubscriptionId> -VMResourceGroup <VMResourceGroup> -VMName <VMName>
+   .\Automanage-OnboardingOneVM-UsingARMTemplate.ps1 -SubscriptionId <SubscriptionId> -VMResourceGroup <VMResourceGroup> -VMName <VMName> -VMLocation <VMLocation> -CreateAutoManageAccount <CreateAutoManageAccount>
 
 .NOTES
     AUTHOR: Azure automanage Team
-    LASTEDIT: Nov 09, 2020  
+    LASTEDIT: Feb 04, 2021  
 
 #>
 
@@ -30,7 +30,13 @@ Param (
     [String] $VMResourceGroup,
 
     [Parameter(Mandatory = $true)]
-    [String] $VMName
+    [String] $VMName,
+
+    [Parameter(Mandatory = $true)]
+    [String] $VMLocation,
+
+    [Parameter(Mandatory = $true)]
+    [bool] $CreateAutoManageAccount
 )
 
 # Install Az module if the Az module is not found
@@ -44,9 +50,9 @@ $Subscription = Select-AzSubscription -SubscriptionId $SubscriptionId
 
 # Parameter
 $AutoManageAccountSubscriptionId = $SubscriptionId
-$AutoManageAccountName = $Subscription.Subscription.Name + "-ABP-AT"
+$AutoManageAccountName = $Subscription.Subscription.Name + "-ABP"
 $AutoManageAccountResourceGroup = $AutoManageAccountName + "_group"
-$AutoManageAccountLocation = "eastus" #Automanage account location hardcoded to eastus
+$AutoManageAccountLocation = $VMLocation
 
 $ARMTemplateparams = @{
     autoManageAccountSubscriptionId = $AutoManageAccountSubscriptionId
@@ -55,6 +61,7 @@ $ARMTemplateparams = @{
     autoManageAccountLocation = $AutoManageAccountLocation
     vmResourceGroup = $VMResourceGroup
     vmName = $VMName
+    createAutoManageAccount = $CreateAutoManageAccount
 }
 
 New-AzDeployment -Location $AutoManageAccountLocation -Name $AutoManageAccountName `
